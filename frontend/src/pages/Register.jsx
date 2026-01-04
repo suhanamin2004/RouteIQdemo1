@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const Register = () => {
+  const[name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [vehicleNo, setVehicleNo] = useState("");
@@ -10,6 +11,7 @@ const Register = () => {
     e.preventDefault();
 
     const formData = {
+      name,
       email,
       phone,
       vehicleNo,
@@ -32,6 +34,15 @@ const Register = () => {
     <div style={styles.container}>
       <form style={styles.form} onSubmit={handleSubmit}>
         <h2 style={styles.heading}>Registration</h2>
+
+        <input
+          type="text"
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          style={styles.input}
+        />
 
         <input
           type="email"

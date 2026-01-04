@@ -1,26 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const AdminDashboard = () => {
-  const [requests, setRequests] = useState([
-    {
-      name: "Ramesh Kumar",
-      veh: "KA-01-2345",
-      email: "ramesh@gmail.com",
-      status: "Pending",
-    },
-    {
-      name: "Suresh Naik",
-      veh: "KA-02-9876",
-      email: "suresh@gmail.com",
-      status: "Pending",
-    },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [status, setStatus] = useState("");
 
-  const updateStatus = (index, status) => {
-    const updated = [...requests];
-    updated[index].status = status;
-    setRequests(updated);
-    alert(`Request ${status} (Frontend Demo Only)`);
+  // Fetch users from backend
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/users");
+      setUsers(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Accept user
+  const handleAccept = async (id) => {
+    console.log(id);
+    
+    try {
+      const res=await axios.put(`http://localhost:3000/users/accept/${id}`);
+      if(res.status==200){
+       setStatus("Accepted") 
+      }
+      fetchUsers();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Reject user
+  const handleReject = async (id) => {
+    try {
+      const res=await axios.delete(`http://localhost:3000/users/reject/${id}`);
+      if(res.status==200){
+       setStatus("Rejected")
+      }
+      fetchUsers();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -61,7 +85,6 @@ const AdminDashboard = () => {
         }
         th, td {
           padding: 15px;
-          text-align: left;
           border-bottom: 1px solid #ddd;
         }
         th {
@@ -75,7 +98,6 @@ const AdminDashboard = () => {
           padding: 8px 15px;
           border-radius: 4px;
           cursor: pointer;
-          font-weight: bold;
           margin-right: 8px;
         }
         .rej-btn {
@@ -85,7 +107,6 @@ const AdminDashboard = () => {
           padding: 8px 15px;
           border-radius: 4px;
           cursor: pointer;
-          font-weight: bold;
         }
         .status {
           font-weight: bold;
@@ -106,53 +127,59 @@ const AdminDashboard = () => {
 
       <div className="admin-container">
         <h2>👮 Admin Dashboard</h2>
-        <p>Incoming Ambulance Priority Requests (Frontend Demo)</p>
+        <p>Incoming Ambulance Priority Requests</p>
 
         <table>
           <thead>
             <tr>
               <th>Driver Name</th>
-              <th>Vehicle #</th>
               <th>Email</th>
+              <th>Phone</th>
+              <th>Vehicle No</th>
               <th>Status / Action</th>
             </tr>
           </thead>
+
           <tbody>
-            {requests.map((req, index) => (
-              <tr key={index}>
-                <td>{req.name}</td>
-                <td>{req.veh}</td>
-                <td>{req.email}</td>
-                <td>
-                  {req.status === "Pending" ? (
-                    <>
-                      <button
-                        className="acc-btn"
-                        onClick={() => updateStatus(index, "Accepted")}
-                      >
-                        Accept
-                      </button>
-                      <button
-                        className="rej-btn"
-                        onClick={() => updateStatus(index, "Rejected")}
-                      >
-                        Reject
-                      </button>
-                    </>
-                  ) : (
-                    <span
-                      className={`status ${
-                        req.status === "Accepted"
-                          ? "accepted"
-                          : "rejected"
-                      }`}
-                    >
-                      {req.status}
-                    </span>
-                  )}
+            {users.length === 0 ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: "center" }}>
+                  No pending requests
                 </td>
               </tr>
-            ))}
+            ) : (
+              users.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.phone}</td>
+                  <td>{user.vehicleNo}</td>
+                  <td>
+  {status === "Accepted" ? (
+    <span className="status accepted">Approved</span>
+  ) : status === "Rejected" ? (
+    <span className="status rejected">Rejected</span>
+  ) : (
+    <>
+      <button
+        className="acc-btn"
+        onClick={() => handleAccept(user.email)}
+      >
+        Accept
+      </button>
+      <button
+        className="rej-btn"
+        onClick={() => handleReject(user.email)}
+      >
+        Reject
+      </button>
+    </>
+  )}
+</td>
+
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
