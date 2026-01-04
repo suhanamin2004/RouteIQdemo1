@@ -54,6 +54,17 @@ app.get("/api/users", async(req, res) => {
   }
 });
 
+app.post("/api/ambulance/login", async(req, res) => {
+  const { password } = req.body;
+ // console.log(req.body);
+  
+  if (password === "1234") {
+    res.status(200).json({ message: "Login successful." });
+  } else {
+    res.status(401).json({ error: "Invalid password." });
+  }
+});
+
 app.put("/users/accept/:id", async(req, res) => {
   console.log(req.params.id);
   

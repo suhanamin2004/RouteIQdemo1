@@ -4,6 +4,7 @@ import Register from   './pages/Register.jsx'
 //import AmbulanceDriver from './pages/ambulances.jsx';
 import AdminDashboard from './pages/admin.jsx';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import MapPage from './pages/HomePage.jsx';
 
 
 function App() {
@@ -11,7 +12,8 @@ function App() {
  <>
  <Router>
   <Routes>
-    <Route path="/" element={<Register />} />
+    <Route path="/" element={<MapPage />} />
+    <Route path="/register" element={<Register />} />
     <Route path="/admin" element={<AdminDashboard />} />
   </Routes>
  </Router>
